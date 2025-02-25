@@ -36,6 +36,7 @@ async function show_home(): Promise<string> {
  * @returns 500 if an error occurs when retrieving the data
  */
 router.get('/stats', async (_, res: Response) => {
+  console.log('Home stats route called');
   try {
     const msg = await show_home();
     res.send(msg);

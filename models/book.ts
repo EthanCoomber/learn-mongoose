@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document, Model, FilterQuery } from 'mongoose';
 import Author, { IAuthor } from './author';
 import Genre, { IGenre } from './genre';
-
+import BookInstance, { IBookInstance } from './bookinstance';
 /**
  * A type that represents a book document in the books collection.
  * The functions defined in this interface are the instance methods of the model.
@@ -36,6 +36,7 @@ export interface IBook extends Document {
 interface IBookModel extends Model<IBook> {
   getAllBooksWithAuthors(projectionOpts: string, sortOpts?: { [key: string]: 1 | -1 }): Promise<IBook[]>;
   getBookCount(fitler?: FilterQuery<IBook>): Promise<number>;
+  getBookDetails(bookId: string): Promise<any>;
 }
 
 /**
@@ -104,6 +105,33 @@ BookSchema.methods.saveBookOfExistingAuthorAndGenre = async function (author_fam
   this.author = authorId;
   this.genre = [genreId];
   return await this.save();  
+}
+
+/**
+ * retrieves the details of a book
+ * @returns a promise of the book details
+ */
+BookSchema.statics.getBookDetails = async function (bookId: string): Promise<any> {
+  console.log('getBookDetails method called');
+  console.log('Book ID: ' + bookId);
+  const book = await this.findById(bookId, { title: 1, author: 1 })
+    .populate('author')
+    .exec();
+  
+  if (!book) {
+    throw new Error('Book not found');
+  }
+  
+  const bookCopies = await BookInstance.find({ book: bookId }, { imprint: 1, status: 1 })
+    .exec();
+  
+  console.log('Book: ' + book);
+  console.log('Book copies: ' + bookCopies);
+  return {
+    title: book.title,
+    author: book.author.family_name + ', ' + book.author.first_name,
+    copies: bookCopies
+  };
 }
 
 /**
