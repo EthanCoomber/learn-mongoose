@@ -112,8 +112,6 @@ BookSchema.methods.saveBookOfExistingAuthorAndGenre = async function (author_fam
  * @returns a promise of the book details
  */
 BookSchema.statics.getBookDetails = async function (bookId: string): Promise<any> {
-  console.log('getBookDetails method called');
-  console.log('Book ID: ' + bookId);
   const book = await this.findById(bookId, { title: 1, author: 1 })
     .populate('author')
     .exec();
@@ -125,8 +123,6 @@ BookSchema.statics.getBookDetails = async function (bookId: string): Promise<any
   const bookCopies = await BookInstance.find({ book: bookId }, { imprint: 1, status: 1 })
     .exec();
   
-  console.log('Book: ' + book);
-  console.log('Book copies: ' + bookCopies);
   return {
     title: book.title,
     author: book.author.family_name + ', ' + book.author.first_name,

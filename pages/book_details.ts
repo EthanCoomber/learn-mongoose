@@ -11,10 +11,24 @@ const router = express.Router();
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
+    if (!req.query.id) {
+      return res.status(400).send('Book ID is required');
+    }
+    
     const results = await Book.getBookDetails(req.query.id as string);
-    res.status(200).send(results);
+    
+    // Ensure response has the required properties: title, author's name, and book instances with imprint and status
+    res.status(200).send({
+      title: results.title,
+      author: results.author,
+      copies: results.copies.map((copy: any) => ({
+        imprint: copy.imprint,
+        status: copy.status
+      }))
+    });
   }
   catch (err) {
+    console.error('Error fetching book details:', err);
     res.status(500).send('Book details not found');
   }
 });
