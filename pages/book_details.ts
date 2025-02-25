@@ -17,7 +17,6 @@ router.get('/', async (req: Request, res: Response) => {
     
     const results = await Book.getBookDetails(req.query.id as string);
     
-    // Ensure response has the required properties: title, author's name, and book instances with imprint and status
     res.status(200).send({
       title: results.title,
       author: results.author,
